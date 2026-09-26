@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+ integrity="sha256-p4NxAoJBhIINfQ3yFvKf2r4ZQ1xQkJ8JQxjVJfQjv1c=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+ integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<title>AstraMars — Mission Command</title>
+<style>
+:root{--bg:#070816;--panel:#10132a;--panel2:#151938;--text:#eef1ff;--muted:#9da6c9;--blue:#4cc9ff;--purple:#9b6cff;--pink:#e66cff;--green:#48e6a2;--amber:#ffc857;--red:#ff5f7a;--line:#252b52}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 75% 10%,#22205a 0,#0b0d20 35%,#070816 75%);color:var(--text);font:14px Inter,system-ui,Segoe UI,sans-serif;min-height:100vh}button,input,select,textarea{font:inherit}.app{display:flex;min-height:100vh}.sidebar{width:245px;background:rgba(8,10,25,.88);border-right:1px solid var(--line);padding:22px 14px;position:fixed;height:100vh;z-index:5}.brand{font-size:22px;font-weight:800;letter-spacing:.5px;padding:8px 10px 28px}.brand span{color:var(--blue)}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:2px;margin-top:5px}.nav button{width:100%;background:none;border:0;color:var(--muted);text-align:left;padding:13px 14px;border-radius:12px;cursor:pointer;margin:3px 0}.nav button:hover,.nav button.active{background:linear-gradient(90deg,#20234c,#151936);color:white}.nav button b{margin-right:10px}.sidebar .status{position:absolute;bottom:20px;left:20px;right:20px;background:#0f1730;border:1px solid #28345d;border-radius:14px;padding:12px;color:var(--muted);font-size:11px}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);margin-right:7px}.main{margin-left:245px;width:calc(100% - 245px);padding:28px 34px;line-height:1.5}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.eyebrow{color:var(--blue);font-size:11px;letter-spacing:2px;text-transform:uppercase}.title{font-size:30px;font-weight:800;margin:5px 0}.sub{color:var(--muted);line-height:1.55}.card p{line-height:1.55}.label,.kpi{letter-spacing:.25px}.table th{color:#cbd3f4;font-weight:700}.table td{color:#e2e6fb}.clock{font-family:monospace;color:#c9d0ff;background:#10142c;border:1px solid var(--line);padding:9px 12px;border-radius:10px}.page{display:none}.page.active{display:block}.grid{display:grid;gap:16px}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.card{background:linear-gradient(145deg,rgba(20,24,54,.95),rgba(11,14,33,.95));border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 12px 35px rgba(0,0,0,.18)}.card h3{margin:0 0 7px;line-height:1.25}.card h2{line-height:1.2}.muted{color:var(--muted)}.metric{font-size:29px;font-weight:800;margin-top:9px}.metric small{font-size:12px;color:var(--muted);font-weight:500}.badge{display:inline-block;padding:5px 8px;border-radius:99px;font-size:10px;background:#172b32;color:var(--green);border:1px solid #214d46}.badge.warn{background:#332b18;color:var(--amber);border-color:#66501d}.badge.danger{background:#351b2a;color:#ff7790;border-color:#663044}.btn{border:0;border-radius:11px;padding:10px 14px;color:white;background:linear-gradient(100deg,#4b7dff,#8d5cff);cursor:pointer;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}.btn:hover{filter:brightness(1.12);transform:translateY(-1px)}.btn.secondary{background:#171b38;border:1px solid #30365f}.btn.danger{background:linear-gradient(100deg,#ff476d,#a747ff)}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.input,select,textarea{background:#0b0f25;border:1px solid #30365f;color:white;border-radius:10px;padding:10px;outline:none;width:100%}.label{font-size:11px;color:var(--muted);margin-bottom:6px}.control{margin-bottom:12px}.hero{min-height:270px;display:flex;align-items:center;justify-content:space-between;overflow:hidden;position:relative}.hero:after{content:'';position:absolute;width:430px;height:430px;border-radius:50%;background:radial-gradient(circle,#713cff55,#2e7fff11 55%,transparent 70%);right:-90px;top:-80px}.planet{width:210px;height:210px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#ffb47c,#b34d42 42%,#5c242d 70%,#1a1020);box-shadow:inset -30px -20px 45px #210d1e,0 0 60px #9c4d8c44;position:relative;z-index:1}.planet:before{content:'';position:absolute;inset:18px 25px 50px 45px;border-radius:50%;background:#d96b4f44;transform:rotate(25deg)}.orbit{height:180px;position:relative;overflow:hidden;margin-top:10px;border-radius:16px;background:radial-gradient(circle at 20% 50%,#fff 0 4px,transparent 5px),radial-gradient(circle at 65% 25%,#aaa 0 2px,transparent 3px),#050611}.orbit:before{content:'';position:absolute;left:12%;top:20%;width:76%;height:62%;border:1px solid #6269a455;border-radius:50%;transform:rotate(-12deg)}.earth,.marsdot,.ship{position:absolute;border-radius:50%;z-index:2}.earth{width:34px;height:34px;background:radial-gradient(circle at 30% 30%,#6df,#164fbd);left:8%;top:53%}.marsdot{width:42px;height:42px;background:radial-gradient(circle at 30% 30%,#ffbd85,#9e3e3e);right:8%;top:34%}.ship{width:10px;height:10px;background:var(--blue);box-shadow:0 0 16px #4cc9ff;left:50%;top:47%;transition:all .3s}.timeline{height:8px;background:#20264b;border-radius:99px;overflow:hidden}.timeline i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:99px}.table{width:100%;border-collapse:collapse}.table td,.table th{padding:11px 7px;border-bottom:1px solid #242949;text-align:left}.bar{height:9px;background:#20264b;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:99px}.toast{position:fixed;right:22px;bottom:22px;background:#121735;border:1px solid #394373;padding:14px 16px;border-radius:13px;display:none;z-index:20;box-shadow:0 12px 40px #0008}.mission3d{height:360px;border-radius:16px;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 45%,#17224a,#050611 68%);border:1px solid var(--line)}canvas{width:100%;height:100%}.hud{position:absolute;top:14px;left:14px;background:#080b18cc;border:1px solid #30365f;border-radius:12px;padding:12px;backdrop-filter:blur(8px)}.crisis{padding:15px;border-radius:14px;border:1px solid #63314a;background:linear-gradient(135deg,#281324,#15112c);margin-top:15px}.kpi{font-size:11px;color:var(--muted)}.footer-note{margin-top:18px;color:#7f88aa;font-size:11px}.recommend{border:1px solid #355b55;background:linear-gradient(135deg,#122d2b,#10152d)}@media(max-width:900px){.sidebar{width:70px}.brand{font-size:0}.brand span{font-size:18px}.brand small,.nav button span,.sidebar .status{display:none}.nav button{text-align:center}.main{margin-left:70px;width:calc(100% - 70px);padding:18px}.g2,.g3,.g4{grid-template-columns:1fr}.hero{flex-direction:column;gap:20px;padding:20px}.planet{width:150px;height:150px}}
+
+.atlasFilter.active,.settleSite.active{outline:1px solid var(--blue);background:#202a58}.roadmapStep{padding:10px;border:1px solid #30365f;border-radius:10px;margin:7px 0;background:#0b1025}
+#missionGlobe{width:100%;height:100%;display:block;cursor:grab}.mission3d.dragging #missionGlobe{cursor:grabbing}
+.globeHud{position:absolute;left:12px;bottom:12px;background:#080b18dd;border:1px solid #30365f;border-radius:10px;padding:9px;font-size:11px}
+.importCard{border:1px solid #30456e;background:linear-gradient(135deg,#101c38,#10142b)}
+.usageNum{font-weight:800}.tiny{font-size:10px;color:var(--muted)}
+
+/* 3D Atlas Styles */
+#threeAtlasContainer{width:100%;height:520px;position:relative;border-radius:16px;overflow:hidden;background:#030408;border:1px solid #343a62;cursor:grab}
+#threeAtlasContainer.grabbing{cursor:grabbing}
+.atlas3dHud{position:absolute;top:14px;left:14px;background:rgba(8,11,24,0.85);border:1px solid #30365f;padding:10px 14px;border-radius:10px;font-size:12px;pointer-events:none;backdrop-filter:blur(6px)}
+.atlas3dControls{position:absolute;bottom:14px;right:14px;display:flex;gap:8px}
+
+/* Tactical CAD Planner Styles */
+.cadGrid{display:grid;grid-template-columns:220px 1fr 280px;gap:16px;height:560px}
+.cadPalette{background:#0b0f26;border:1px solid #252b52;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.cadItem{background:#131838;border:1px solid #30365f;border-radius:8px;padding:10px;cursor:grab;display:flex;align-items:center;gap:10px;font-size:12px;font-weight:600;transition:all 0.2s}
+.cadItem:hover{border-color:var(--blue);background:#1a204a}
+.cadCanvasWrapper{position:relative;background:#050714;border:1px solid #252b52;border-radius:14px;overflow:hidden}
+#cadCanvas{width:100%;height:100%;display:block}
+.cadInspector{background:#0b0f26;border:1px solid #252b52;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:12px}
+
+/* Surface Comms Interface */
+.chatContainer{display:flex;flex-direction:column;height:550px;background:#0a0d21;border:1px solid #252b52;border-radius:16px;overflow:hidden}
+.chatHeader{padding:14px 20px;background:#101432;border-bottom:1px solid #252b52;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.chatBox{flex:1;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;background:radial-gradient(circle at 50% 50%,#0e122b 0%,#070816 100%)}
+.msg{max-width:75%;padding:12px 16px;border-radius:12px;font-size:13px;line-height:1.4;position:relative}
+.msg.remote{align-self:flex-start;background:#151a3a;border:1px solid #2c3566;color:#e2e6fb;border-bottom-left-radius:2px}
+.msg.mars{align-self:flex-end;background:linear-gradient(135deg,#233769,#1d2754);border:1px solid #3d518c;color:#fff;border-bottom-right-radius:2px}
+.msg .meta{font-size:10px;color:var(--muted);margin-bottom:4px;display:flex;justify-content:space-between;gap:10px}
+.chatInputArea{padding:14px;background:#101432;border-top:1px solid #252b52;display:flex;gap:10px;align-items:center}
+</style></head>
+<body>
+<div class="app"><aside class="sidebar"><div class="brand">ASTRA<span>MARS</span><small>MISSION COMMAND</small></div><nav class="nav">
+<button class="active" data-page="mission"><b>🚀</b><span>Mission Simulator</span></button>
+<button data-page="atlas"><b>🪐</b><span>3D Mars Atlas</span></button>
+<button data-page="settlement"><b>📐</b><span>CAD Planner</span></button>
+<button data-page="resources"><b>📦</b><span>Life Support</span></button>
+<button data-page="crisis"><b>🌪️</b><span>Crisis Center</span></button>
+<button data-page="comms"><b>📡</b><span>Surface Comms Link</span></button>
+</nav><div class="status"><span class="dot"></span>Simulation systems nominal<br><span style="padding-left:14px">Data mode: DEMO / replaceable APIs</span></div></aside>
+<main class="main"><div class="top"><div><div class="eyebrow" id="eyebrow">Mission Control</div><div class="title" id="title">Transfer Journey</div><div class="sub" id="sub">Plan a transfer window and watch your spacecraft cross interplanetary space.</div></div><div class="clock" id="clock">--:--:--</div></div>
+<section class="page active" id="mission"><div class="card hero"><div style="max-width:600px;position:relative;z-index:2"><span class="badge">INTERPLANETARY TRANSFER</span><h1 style="font-size:42px;line-height:1.05;margin:12px 0">Your first journey to<br><span style="color:var(--blue)">the red planet.</span></h1><p class="sub">Choose a departure date and cruise velocity. The simulator estimates travel time and visualizes the transfer path.</p><div class="grid g3" style="margin-top:18px"><div class="control"><div class="label">Departure date</div><input class="input" id="depart" type="date"></div><div class="control"><div class="label">Cruise speed</div><select id="speed"><option value="25">25 km/s — conservative</option><option value="35" selected>35 km/s — balanced</option><option value="50">50 km/s — fast</option><option value="70">70 km/s — extreme</option></select></div><div style="display:flex;align-items:end"><button class="btn" id="launch" style="width:100%">Simulate Journey</button></div></div></div><div class="planet"></div></div><div class="grid g4" style="margin-top:16px">
+<div class="card"><div class="kpi">DISTANCE REMAINING</div><div class="metric" id="distance">225.0M <small>km</small></div></div>
+<div class="card"><div class="kpi">TRAVEL TIME</div><div class="metric" id="travel">~74 <small>days</small></div></div>
+<div class="card"><div class="kpi">ARRIVAL ESTIMATE</div><div class="metric" id="arrival">— <small>UTC</small></div></div>
+<div class="card"><div class="kpi">TRANSFER STATUS</div><div class="metric" id="transfer">READY</div></div></div>
+<div class="card" style="margin-top:16px">
+<h3>🚀 Payload + propulsion</h3>
+<div class="grid g4" style="margin-top:12px">
+<div class="control"><div class="label">Payload mass</div><input class="input" id="payload" type="number" min="0.1" step="0.1" value="5"> <span class="tiny">metric tonnes</span></div>
+<div class="control"><div class="label">Fuel efficiency</div><select id="fuelEfficiency"><option value="0.72">Conservative · 0.72</option><option value="0.82" selected>Balanced · 0.82</option><option value="0.90">High-efficiency · 0.90</option></select></div>
+<div><div class="kpi">FUEL REQUIRED</div><div class="metric" id="fuelRequired">— <small>t</small></div></div>
+<div><div class="kpi">TOTAL DEPARTURE MASS</div><div class="metric" id="departureMass">— <small>t</small></div></div>
+</div>
+<p class="footer-note">Fuel is a simulator estimate based on payload, cruise speed and an adjustable efficiency factor; it is not a flight-certified propulsion calculation.</p>
+</div>
+<div class="card" style="margin-top:16px"><h3>🛰️ Live transfer trajectory</h3><div class="orbit"><div class="earth"></div><div class="ship" id="ship"></div><div class="marsdot"></div></div><div class="row" style="justify-content:space-between;margin-top:10px"><span class="muted">Departure Point</span><span class="muted" id="missionDay">Day 0 / 74</span><span class="muted">Mars</span></div><div class="timeline" style="margin-top:8px"><i id="progress"></i></div></div>
+<div class="card" style="margin-top:16px"><h3>🌐 3D transfer view</h3><p class="muted">Drag to rotate. Scroll to zoom. The probe position updates with the simulation.</p><div class="mission3d" id="mission3d"><canvas id="missionGlobe"></canvas><div class="globeHud">SURFACE → MARS · <span id="globeReadout">Probe at departure</span></div></div></div></section>
+
+<!-- SECTION: 3D MARS ATLAS -->
+<section class="page" id="atlas">
+<div class="grid g2">
+<div class="card">
+<div class="row" style="justify-content:space-between"><div><h3>🪐 3D Interactive Globe Atlas</h3><p class="muted">Orbit, pan, and click anywhere on the 3D Martian globe to extract precise planetographic coordinates.</p></div><span class="badge" id="atlasMode">3D GLOBE ACTIVE</span></div>
+<div class="row" style="margin:10px 0"><button class="btn secondary atlasFilter active" data-filter="all">All Points</button><button class="btn secondary atlasFilter" data-filter="sites">Primary Sites</button><button class="btn secondary atlasFilter" data-filter="landmarks">Landmarks</button></div>
+<div id="threeAtlasContainer">
+<div class="atlas3dHud">
+<b>LOCATION TARGET</b><br>
+Latitude: <span id="hudLat" style="color:var(--blue)">0.00°</span><br>
+Longitude: <span id="hudLon" style="color:var(--blue)">0.00°</span>
+</div>
+<div class="atlas3dControls">
+<button class="btn secondary" id="resetCam">Reset View</button>
+</div>
+</div>
+<div class="row" style="justify-content:space-between;margin-top:10px"><span class="muted" id="mapReadout">Click globe to inspect coordinates</span><button class="btn secondary" id="compareSites">Compare candidate sites</button></div></div>
+<div class="card"><h3>Location Intelligence & Scanning</h3><div id="landmarkInfo" style="margin-top:16px"><div class="metric">Click any region</div><p class="muted">Coordinates, terrain characteristics, and resource availability will generate upon picking a target location on the 3D globe.</p></div><hr style="border-color:var(--line);margin:20px 0">
+<div class="grid g2"><div class="control"><div class="label">Mission priority</div><select id="atlasPriority"><option value="balanced">Balanced settlement</option><option value="water">Maximum water</option><option value="energy">Maximum energy</option><option value="safety">Maximum safety</option></select></div><div class="control"><div class="label">Crew target</div><input class="input" id="atlasCrew" type="number" min="1" value="20"></div></div>
+<div class="row"><button class="btn" id="scan">Run Tactical Site Scan</button><button class="btn secondary" id="candidate">Send to CAD Planner</button></div><div id="scanOut" class="footer-note"></div></div>
+</div></section>
+
+<!-- SECTION: FUNCTIONAL CAD SETTLEMENT PLANNER -->
+<section class="page" id="settlement">
+<div class="card" style="margin-bottom:16px">
+<div class="row" style="justify-content:space-between">
+<div><h2>📐 Tactical Infrastructure CAD Planner</h2><p class="muted">Drag structural modules onto the grid, design layout grids, and monitor real-time resource/spatial engineering metrics.</p></div>
+<div class="row"><button class="btn secondary" id="clearCad">Clear Grid</button><button class="btn" id="exportCad">Export Blueprint</button></div>
+</div>
+</div>
+<div class="cadGrid">
+<div class="cadPalette">
+<div class="label" style="text-transform:uppercase;letter-spacing:1px;font-weight:700">Module Library</div>
+<div class="cadItem" draggable="true" data-type="hab"><span>🏠</span> Crew Habitat Unit</div>
+<div class="cadItem" draggable="true" data-type="solar"><span>☀️</span> Photovoltaic Array</div>
+<div class="cadItem" draggable="true" data-type="water"><span>💧</span> ISRU Water Extractor</div>
+<div class="cadItem" draggable="true" data-type="greenhouse"><span>🌱</span> Hydroponic Dome</div>
+<div class="cadItem" draggable="true" data-type="comm"><span>📡</span> Relay Array</div>
+<div class="cadItem" draggable="true" data-type="nuclear"><span>⚛️</span> Micro Reactor Unit</div>
+<div style="margin-top:auto;background:#050714;padding:10px;border-radius:8px;border:1px solid #1e2447" class="tiny">
+Drag items onto the canvas grid to place modules. Select placed items to edit or move.
+</div>
+</div>
+<div class="cadCanvasWrapper" id="cadWrapper">
+<canvas id="cadCanvas"></canvas>
+</div>
+<div class="cadInspector">
+<div class="label" style="text-transform:uppercase;letter-spacing:1px;font-weight:700">Engineering Telemetry</div>
+<div class="card" style="padding:12px;background:#050714"><div class="kpi">GRID UNITS USED</div><div class="metric" id="cadModuleCount">0 <small>/ 64</small></div></div>
+<div class="card" style="padding:12px;background:#050714"><div class="kpi">ESTIMATED POWER balance</div><div class="metric" id="cadPowerBalance">0 <small>kW</small></div></div>
+<div class="card" style="padding:12px;background:#050714"><div class="kpi">DAILY WATER LOOP</div><div class="metric" id="cadWaterOutput">0 <small>L/day</small></div></div>
+<div class="card" style="padding:12px;background:#050714"><div class="kpi">CREW CAPACITY</div><div class="metric" id="cadCrewCap">0 <small>settlers</small></div></div>
+<div style="margin-top:auto"><button class="btn" id="build" style="width:100%">Generate Deployment Roadmap</button></div>
+</div>
+</div>
+<div class="card" style="margin-top:16px"><h3>🛰️ Active Infrastructure Roadmap</h3><p class="muted" id="roadmapIntro">Add and configure modules in CAD view to calculate placement logic and construction sequencing.</p><table class="table" id="roadmapTable"><tr><th>Module</th><th>Grid Coordinates</th><th>Power Req / Gen</th><th>Status</th></tr></table></div>
+</section>
+
+<section class="page" id="resources"><div class="grid g4"><div class="card"><div class="kpi">DRINKING WATER</div><div class="metric" id="waterLvl">82% <small>buffer</small></div><div class="bar" style="margin-top:12px"><i id="waterBar" style="width:82%"></i></div></div><div class="card"><div class="kpi">OXYGEN</div><div class="metric" id="oxyLvl">91% <small>buffer</small></div><div class="bar" style="margin-top:12px"><i id="oxyBar" style="width:91%"></i></div></div><div class="card"><div class="kpi">FOOD</div><div class="metric" id="foodLvl">67% <small>buffer</small></div><div class="bar" style="margin-top:12px"><i id="foodBar" style="width:67%"></i></div></div><div class="card"><div class="kpi">POWER STORAGE</div><div class="metric" id="powerLvl">74% <small>buffer</small></div><div class="bar" style="margin-top:12px"><i id="powerBar" style="width:74%"></i></div></div></div><div class="card" style="margin-top:16px"><h3>📊 Daily usage by component</h3><p class="muted">Current modelled daily consumption for the selected crew.</p>
+<table class="table"><tr><th>Component</th><th>Daily usage</th><th>Unit</th><th>Trend</th></tr>
+<tr><td>💧 Water loop</td><td class="usageNum" id="useWater">54</td><td>L/day</td><td><span class="badge">STABLE</span></td></tr>
+<tr><td>🫁 Oxygen system</td><td class="usageNum" id="useOxy">16</td><td>kg/day</td><td><span class="badge">STABLE</span></td></tr>
+<tr><td>🌱 Food system</td><td class="usageNum" id="useFood">12</td><td>kg/day</td><td><span class="badge warn">MONITOR</span></td></tr>
+<tr><td>⚡ Power systems</td><td class="usageNum" id="usePower">186</td><td>kWh/day</td><td><span class="badge">STABLE</span></td></tr>
+<tr><td>🧰 Maintenance / spares</td><td class="usageNum" id="useSpare">0.7</td><td>kg/day</td><td><span class="badge warn">MONITOR</span></td></tr></table></div>
+<div class="grid g2" style="margin-top:16px"><div class="card"><h3>📦 Supply planner</h3><p class="muted">Estimate which essentials need to arrive versus local production.</p><table class="table"><tr><th>Resource</th><th>Initial need</th><th>Local source</th><th>Import needed</th></tr><tr><td>Water</td><td>18 t</td><td>Ice extraction</td><td>4 t</td></tr><tr><td>Food</td><td>6 t</td><td>Greenhouse</td><td>5 t</td></tr><tr><td>O₂</td><td>2.2 t</td><td>ISRU + electrolysis</td><td>0.4 t</td></tr><tr><td>Spare parts</td><td>—</td><td>Limited</td><td>100%</td></tr></table>
+<div class="card importCard" style="margin-top:14px"><h3>📦 Import arrival tracker</h3>
+<div class="grid g3" style="margin-top:10px">
+<div><div class="kpi">NEXT SHIPMENT</div><div class="metric" id="importArrival">— <small>days</small></div></div>
+<div><div class="kpi">SHIPMENT STATUS</div><div class="metric" id="importStatus">SCHEDULED</div></div>
+<div><div class="kpi">CARGO</div><div class="metric" id="importCargo">9.4 <small>t</small></div></div>
+</div>
+<div class="timeline" style="margin-top:10px"><i id="importProgress" style="width:42%"></i></div>
+<p class="footer-note">Illustrative logistics clock. Set the transfer duration in Mission Simulator to update the estimated arrival.</p>
+</div>
+</div><div class="card"><h3>⏳ Buffer forecast</h3><p class="muted">Change crew size and simulate consumption.</p><div class="control"><div class="label">Crew</div><input class="input" id="crew" type="number" min="1" value="20"></div><button class="btn" id="forecast">Calculate survival buffer</button><div id="forecastOut" style="margin-top:15px"></div></div></div></section>
+
+<section class="page" id="crisis"><div class="card"><span class="badge danger">CRISIS SIMULATOR</span><h2>🌪️ Mars Emergency Command</h2><p class="muted">Choose a situation and severity, then simulate how the settlement responds.</p>
+<div class="grid g3" style="margin:18px 0"><div class="control"><div class="label">Situation</div><select id="crisisType"><option value="dust">🌪️ Regional dust storm</option><option value="globalDust">🟥 Global dust storm</option><option value="power">⚡ Power failure</option><option value="water">💧 Water contamination</option><option value="comm">📡 Communication loss</option><option value="pressure">🫧 Habitat pressure leak</option></select></div><div class="control"><div class="label">Severity</div><select id="crisisSeverity"><option value="low">Level 1 · Contained</option><option value="medium" selected>Level 2 · Serious</option><option value="high">Level 3 · Critical</option></select></div><div style="display:flex;align-items:end"><button class="btn danger" id="simulateCrisis" style="width:100%">Simulate Situation</button></div></div>
+<div class="row" style="margin-bottom:18px"><button class="btn secondary" id="evac">🚨 Start Evacuation Simulation</button><button class="btn secondary" id="clearCrisis">Clear / Restore Nominal</button></div>
+<div class="grid g4"><div class="card"><div class="kpi">SOLAR OUTPUT</div><div class="metric" id="solar">100%</div></div><div class="card"><div class="kpi">HABITAT STATUS</div><div class="metric" id="hab">NOMINAL</div></div><div class="card"><div class="kpi">NETWORK LINK</div><div class="metric" id="comm">ONLINE</div></div><div class="card"><div class="kpi">EVAC READINESS</div><div class="metric" id="evacReady">63%</div></div></div>
+<div class="crisis" id="crisisLog"><b>System log</b><p class="muted">No active crisis. Select a situation to begin a controlled simulation.</p></div><div id="evacPanel" class="card" style="display:none;margin-top:15px;background:#11132b"><h3>🚨 Evacuation sequence</h3><div id="evacSteps"></div></div></div></section>
+
+<!-- SECTION: MARS SURFACE COMMS LINK -->
+<section class="page" id="comms">
+<div class="card">
+<h2>📡 Mars Surface Network Relay Terminal</h2>
+<p class="muted">Sub-surface optical laser communications interface for intra-colony messaging and orbital relay connections across Martian settlement habitats.</p>
+<div class="chatContainer" style="margin-top:16px">
+<div class="chatHeader">
+<div class="row"><span class="dot"></span><b>RELAY NODE #482 (JEZERO OUTPOST ↔ MARS BASE ALPHA)</b></div>
+<div class="tiny" style="color:var(--blue);font-family:monospace" id="commsDelay">LATENCY: REAL-TIME LINK</div>
+</div>
+<div class="chatBox" id="chatBox">
+<div class="msg remote">
+<div class="meta"><span>JEZERO OUTPOST COMMAND</span><span>08:14 UTC</span></div>
+AstraMars Central, this is Jezero Outpost. Telemetry received. Please report local habitat atmospheric stability and solar array output.
+</div>
+<div class="msg mars">
+<div class="meta"><span>MARS BASE ALPHA</span><span>08:16 UTC</span></div>
+Jezero Outpost, AstraMars Alpha here. Habitat atmospheric status nominal (101.3 kPa, 21% O2). Solar arrays operating at 94% efficiency following automated dust sweep.
+</div>
+</div>
+<div class="chatInputArea">
+<input type="text" id="chatInput" placeholder="Type transmission to Station Command..." class="input" style="background:#070919">
+<button class="btn" id="sendMsgBtn">Transmit Signal</button>
+</div>
+</div>
+</div>
+</section>
+
+<div class="footer-note">Prototype note: live Mars datasets, orbital ephemerides and hazard feeds should be connected to the marked data layer before presenting numerical outputs as real predictions.</div></main></div><div class="toast" id="toast"></div>
+
+<script>
+const pages={
+mission:['Mission Control','Transfer Journey','Plan a transfer window and watch your spacecraft cross interplanetary space.'],
+atlas:['3D Mars Atlas','Interactive Martian Globe','Rotate, zoom, and click anywhere on Mars to inspect precise geographical coordinates.'],
+settlement:['CAD Planner','Functional Settlement CAD','Grid-based spatial engineering and habitat infrastructure design.'],
+resources:['Life Support','Resource & Storage','Track buffers and estimate what must be supplied locally.'],
+crisis:['Crisis Command','Mars Crisis Center','Stress-test the settlement against environmental and systems failures.'],
+comms:['Surface Comms','Mars Surface Relay Network','Transmit messages across Mars settlement hubs and orbital relays with real-time telemetry.']
+};
+
+const $=id=>document.getElementById(id);
+function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2600)}
+function showPage(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  $(p).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===p));
+  [$('eyebrow').textContent,$('title').textContent,$('sub').textContent]=pages[p];
+  if(p==='atlas') setTimeout(onAtlasResize, 50);
+  if(p==='settlement') setTimeout(initCadCanvas, 50);
+}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>showPage(b.dataset.page));
+setInterval(()=>{$('clock').textContent=new Date().toLocaleTimeString()},1000);$('depart').value=new Date().toISOString().slice(0,10);
+
+/* Mission Simulator Code */
+let journeyTimer=null,journey=0,journeyDays=74,missionDistanceKm=225000000;
+function calcMission(){
+  const speed=+$('speed').value, payload=Math.max(.1,+$('payload').value||5), eff=+$('fuelEfficiency').value;
+  journeyDays=Math.max(12,Math.round(missionDistanceKm/(speed*86400)));
+  const fuel=Math.max(1,+(payload*(0.35+(speed/35)*0.55)/eff).toFixed(2));
+  $('travel').innerHTML='~'+journeyDays+' <small>days</small>';
+  $('fuelRequired').innerHTML=fuel.toFixed(2)+' <small>t</small>';$('departureMass').innerHTML=(payload+fuel).toFixed(2)+' <small>t</small>';
+  const dep=new Date(($('depart').value||new Date().toISOString().slice(0,10))+'T00:00:00Z');
+  const arr=new Date(dep.getTime()+journeyDays*86400000);
+  $('arrival').innerHTML=arr.toISOString().slice(0,10)+' <small>UTC</small>';$('missionDay').textContent='Day 0 / '+journeyDays;
+  $('distance').innerHTML=(missionDistanceKm/1e6).toFixed(1)+'M <small>km</small>';
+}
+function runJourney(){
+  clearInterval(journeyTimer);calcMission();
+  $('transfer').textContent='IN TRANSIT';journey=0;$('progress').style.width='0%';$('ship').style.left='8%';$('ship').style.top='53%';
+  const tickMs=120;
+  journeyTimer=setInterval(()=>{
+    journey++;
+    let p=Math.min(1,journey/journeyDays);
+    const remain=missionDistanceKm*(1-p);
+    $('distance').innerHTML=(remain/1e6).toFixed(1)+'M <small>km</small>';
+    if($('importArrival')){$('importArrival').innerHTML=Math.max(0,journeyDays-journey)+' <small>days</small>';$('importStatus').textContent=journey?'IN TRANSIT':'SCHEDULED';}
+    $('progress').style.width=(p*100)+'%';$('missionDay').textContent='Day '+journey+' / '+journeyDays;
+    $('ship').style.left=(8+84*p)+'%';$('ship').style.top=(53-19*p+Math.sin(p*5)*7)+'%';$('globeReadout').textContent='Probe '+Math.round(p*100)+'% complete · '+(remain/1e6).toFixed(1)+'M km remaining';
+    drawMissionGlobe(p);
+    if(p>=1){clearInterval(journeyTimer);$('transfer').textContent='ARRIVED';$('distance').innerHTML='0.0 <small>km</small>';toast('🪐 Mars arrival simulation complete')}
+  },tickMs);
+  toast('🚀 Transfer simulation launched');
+}
+$('launch').onclick=runJourney;
+$('speed').onchange=calcMission;$('payload').oninput=calcMission;$('fuelEfficiency').onchange=calcMission;$('depart').onchange=calcMission;
+
+let globeRotX=0,globeRotY=0;
+function drawMissionGlobe(p=0){
+  const c=$('missionGlobe');if(!c)return;
+  const r=c.getBoundingClientRect(),d=devicePixelRatio||1;c.width=r.width*d;c.height=r.height*d;
+  const x=c.getContext('2d');x.setTransform(d,0,0,d,0,0);let w=r.width,h=r.height;x.clearRect(0,0,w,h);
+  const bg=x.createRadialGradient(w*.5,h*.45,20,w*.5,h*.5,Math.max(w,h)*.7);bg.addColorStop(0,'#111a39');bg.addColorStop(1,'#02030a');x.fillStyle=bg;x.fillRect(0,0,w,h);
+  let seed=19;function rnd(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}
+  for(let i=0;i<150;i++){let sx=rnd()*w,sy=rnd()*h,ss=rnd()*1.5+.2;x.fillStyle='rgba(210,225,255,'+(0.2+rnd()*.65)+')';x.fillRect(sx,sy,ss,ss)}
+  const cx=w*.73,cy=h*.52,rad=Math.min(w,h)*.29;
+  const g=x.createRadialGradient(cx-rad*.38,cy-rad*.42,rad*.08,cx,cy,rad*1.03);
+  g.addColorStop(0,'#f6ad78');g.addColorStop(.28,'#c96850');g.addColorStop(.62,'#873e3b');g.addColorStop(.86,'#4b2029');g.addColorStop(1,'#160b15');x.fillStyle=g;x.beginPath();x.arc(cx,cy,rad,0,Math.PI*2);x.fill();
+  const ex=w*.16,ey=h*.52,tx=cx-rad*.95,ty=cy-rad*.10;const px=ex+(tx-ex)*p,py=ey+(ty-ey)*p-Math.sin(p*Math.PI)*55;
+  x.strokeStyle='rgba(110,194,255,.35)';x.lineWidth=1.5;x.setLineDash([5,7]);x.beginPath();x.moveTo(ex,ey);x.quadraticCurveTo(w*.48,h*.16,tx,ty);x.stroke();x.setLineDash([]);
+  x.fillStyle='#69d7ff';x.shadowBlur=18;x.shadowColor='#69d7ff';x.beginPath();x.arc(px,py,4.5,0,Math.PI*2);x.fill();x.shadowBlur=0;
+  x.fillStyle='#aeb9df';x.font='11px Inter,system-ui';x.fillText('MARS',cx-rad*.28,cy+rad+24);x.fillText('ORIGIN',ex-18,ey+24);
+}
+(function setupGlobe(){
+  const box=$('mission3d');if(!box)return;
+  let down=false,sx=0,sy=0;
+  box.onpointerdown=e=>{down=true;sx=e.clientX;sy=e.clientY;box.classList.add('dragging');box.setPointerCapture(e.pointerId)};
+  box.onpointermove=e=>{if(!down)return;globeRotY+=e.clientX-sx;globeRotX+=e.clientY-sy;sx=e.clientX;sy=e.clientY;drawMissionGlobe(journey/journeyDays)};
+  box.onpointerup=()=>{down=false;box.classList.remove('dragging')};
+  window.addEventListener('resize',()=>drawMissionGlobe(journey/journeyDays));drawMissionGlobe(0);
+})();
+calcMission();
+
+/* --------------------------------------------------------
+   3D MARS ATLAS (THREE.JS GLOBE + COORDINATE SCANNER)
+-------------------------------------------------------- */
+let scene3d, camera3d, renderer3d, marsGlobeMesh, pinGroup;
+let isDraggingAtlas = false, previousMousePosition = { x: 0, y: 0 };
+const marsSites = {
+  jezero: { name: 'Jezero Crater', lat: 18.38, lon: 77.58, type: 'site', desc: 'Ancient lake basin with high water-ice and clay potential.' },
+  elysium: { name: 'Elysium Planitia', lat: 11.60, lon: 157.50, type: 'site', desc: 'Volcanic plain with flat topography for solar arrays.' },
+  arcadia: { name: 'Arcadia Planitia', lat: 39.30, lon: -170.30, type: 'site', desc: 'Abundant shallow subsurface ice sheets.' },
+  olympus: { name: 'Olympus Mons', lat: 18.65, lon: -133.80, type: 'landmark', desc: 'Tallest volcano in solar system.' },
+  valles: { name: 'Valles Marineris', lat: -13.90, lon: -59.20, type: 'landmark', desc: 'Massive canyon system spanning thousands of kilometers.' }
+};
+
+function init3DMarsAtlas(){
+  const container = $('threeAtlasContainer');
+  if(!container) return;
+
+  scene3d = new THREE.Scene();
+  camera3d = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+  camera3d.position.z = 3.5;
+
+  renderer3d = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer3d.setSize(container.clientWidth, container.clientHeight);
+  renderer3d.setPixelRatio(window.devicePixelRatio);
+  container.appendChild(renderer3d.domElement);
+
+  // Lighting
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+  scene3d.add(ambientLight);
+  const dirLight = new THREE.DirectionalLight(0xffeedd, 1.2);
+  dirLight.position.set(5, 3, 5);
+  scene3d.add(dirLight);
+
+  // Procedural Mars Canvas Texture
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024; canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#9e4b33'; ctx.fillRect(0,0,1024,512);
+  for(let i=0; i<800; i++){
+    ctx.fillStyle = Math.random() > 0.5 ? 'rgba(74,28,18,0.25)' : 'rgba(212,131,93,0.2)';
+    ctx.beginPath();
+    ctx.arc(Math.random()*1024, Math.random()*512, Math.random()*60+10, 0, Math.PI*2);
+    ctx.fill();
+  }
+  // Polar Ice Caps
+  ctx.fillStyle = 'rgba(240,245,255,0.85)';
+  ctx.fillRect(0, 0, 1024, 35);
+  ctx.fillRect(0, 477, 1024, 35);
+
+  const marsTexture = new THREE.CanvasTexture(canvas);
+  const geometry = new THREE.SphereGeometry(1, 64, 64);
+  const material = new THREE.MeshStandardMaterial({
+    map: marsTexture,
+    roughness: 0.8,
+    metalness: 0.1
+  });
+
+  marsGlobeMesh = new THREE.Mesh(geometry, material);
+  scene3d.add(marsGlobeMesh);
+
+  // Pin markers group
+  pinGroup = new THREE.Group();
+  marsGlobeMesh.add(pinGroup);
+  renderAtlasPins();
+
+  // Mouse Interaction Controls
+  container.addEventListener('mousedown', (e) => {
+    isDraggingAtlas = true;
+    container.classList.add('grabbing');
+    previousMousePosition = { x: e.clientX, y: e.clientY };
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!isDraggingAtlas) return;
+    const deltaX = e.clientX - previousMousePosition.x;
+    const deltaY = e.clientY - previousMousePosition.y;
+
+    marsGlobeMesh.rotation.y += deltaX * 0.005;
+    marsGlobeMesh.rotation.x += deltaY * 0.005;
+    previousMousePosition = { x: e.clientX, y: e.clientY };
+  });
+
+  window.addEventListener('mouseup', () => {
+    isDraggingAtlas = false;
+    container.classList.remove('grabbing');
+  });
+
+  container.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    camera3d.position.z = Math.min(Math.max(camera3d.position.z + e.deltaY * 0.002, 1.8), 6.0);
+  });
+
+  // Click Coordinate Raycaster
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+
+  container.addEventListener('click', (e) => {
+    const rect = container.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left) / container.clientWidth) * 2 - 1;
+    mouse.y = -((e.clientY - rect.top) / container.clientHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera3d);
+    const intersects = raycaster.intersectObject(marsGlobeMesh);
+
+    if (intersects.length > 0) {
+      const point = intersects[0].point;
+      const localPoint = marsGlobeMesh.worldToLocal(point.clone());
+      const lat = (Math.asin(localPoint.y) * (180 / Math.PI)).toFixed(2);
+      const lon = (Math.atan2(localPoint.x, localPoint.z) * (180 / Math.PI)).toFixed(2);
+
+      $('hudLat').textContent = `${lat}°`;
+      $('hudLon').textContent = `${lon}°`;
+      
+      $('landmarkInfo').innerHTML = `
+        <div class="badge">SELECTED COORDINATE</div>
+        <h2>${lat}°N, ${lon}°E</h2>
+        <p class="muted">Custom location targeted on 3D Martian surface.</p>
+        <div class="grid g2" style="margin-top:14px">
+          <div>💧 Water Est. <b>${Math.floor(Math.random()*40+50)}%</b></div>
+          <div>🪨 Terrain Slope <b>${(Math.random()*8).toFixed(1)}°</b></div>
+        </div>
+      `;
+      toast(`Clicked coordinates: ${lat}°, ${lon}°`);
+    }
+  });
+
+  function animate3D() {
+    requestAnimationFrame(animate3D);
+    if (!isDraggingAtlas) {
+      marsGlobeMesh.rotation.y += 0.0008;
+    }
+    renderer3d.render(scene3d, camera3d);
+  }
+  animate3D();
+}
+
+function latLonToVector3(lat, lon, radius) {
+  const phi = (90 - lat) * (Math.PI / 180);
+  const theta = (lon + 180) * (Math.PI / 180);
+  const x = -(radius * Math.sin(phi) * Math.cos(theta));
+  const z = (radius * Math.sin(phi) * Math.sin(theta));
+  const y = (radius * Math.cos(phi));
+  return new THREE.Vector3(x, y, z);
+}
+
+function renderAtlasPins(filter = 'all'){
+  while(pinGroup.children.length > 0) pinGroup.remove(pinGroup.children[0]);
+  
+  Object.entries(marsSites).forEach(([key, site]) => {
+    if (filter === 'sites' && site.type !== 'site') return;
+    if (filter === 'landmarks' && site.type !== 'landmark') return;
+
+    const pos = latLonToVector3(site.lat, site.lon, 1.02);
+    const pinGeo = new THREE.SphereGeometry(0.025, 16, 16);
+    const pinMat = new THREE.MeshBasicMaterial({ color: site.type === 'site' ? 0x48e6a2 : 0xb36cff });
+    const pinMesh = new THREE.Mesh(pinGeo, pinMat);
+    pinMesh.position.copy(pos);
+    pinGroup.add(pinMesh);
+  });
+}
+
+function onAtlasResize() {
+  const container = $('threeAtlasContainer');
+  if(!container || !renderer3d) return;
+  camera3d.aspect = container.clientWidth / container.clientHeight;
+  camera3d.updateProjectionMatrix();
+  renderer3d.setSize(container.clientWidth, container.clientHeight);
+}
+
+$('resetCam').onclick = () => {
+  if (camera3d && marsGlobeMesh) {
+    camera3d.position.set(0, 0, 3.5);
+    marsGlobeMesh.rotation.set(0, 0, 0);
+  }
+};
+
+document.querySelectorAll('.atlasFilter').forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll('.atlasFilter').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    renderAtlasPins(b.dataset.filter);
+  }
+});
+
+/* Tactical Site Scan handlers */
+if($('scan')){$('scan').onclick = () => {
+    const priority = $('atlasPriority').value;
+    const crew = $('atlasCrew').value;
+    $('scanOut').innerHTML = `<div class="card recommend" style="margin-top:10px;padding:12px">
+      <b>Tactical Scan Complete (${priority.toUpperCase()})</b><br>
+      Optimal site match evaluated for ${crew} crew members. Jezero Crater selected as highest operational suitability index (94.2%).
+    </div>`;
+    toast('Tactical site scan finished');
+  };
+}
+if($('candidate')){$('candidate').onclick = () => {
+    showPage('settlement');
+    toast('Target candidate sent to CAD Planner');
+  };
+}
+if($('compareSites')){
+  $('compareSites').onclick = () => {$('landmarkInfo').innerHTML = `
+      <div class="badge">SITE COMPARISON</div>
+      <h2>Jezero vs Arcadia</h2>
+      <p class="muted">Jezero: High clay/water ice diversity, medium slope. Arcadia: Abundant shallow ice, flat terrain.</p>
+    `;
+    toast('Site comparison loaded');
+  };
+}
+
+/* --------------------------------------------------------
+   FUNCTIONAL CAD SETTLEMENT PLANNER (CANVAS ENGINE)
+-------------------------------------------------------- */
+const cadModules = [];
+let cadCanvas, cadCtx;
+const gridSize = 32;
+
+function initCadCanvas(){
+  const wrapper = $('cadWrapper');
+  cadCanvas = $('cadCanvas');
+  if(!wrapper || !cadCanvas) return;
+
+  cadCanvas.width = wrapper.clientWidth;
+  cadCanvas.height = wrapper.clientHeight;
+  cadCtx = cadCanvas.getContext('2d');
+
+  renderCad();
+
+  wrapper.ondragover = (e) => e.preventDefault();
+  wrapper.ondrop = (e) => {
+    e.preventDefault();
+    const type = e.dataTransfer.getData('type');
+    const rect = cadCanvas.getBoundingClientRect();
+    const x = Math.floor((e.clientX - rect.left) / gridSize);
+    const y = Math.floor((e.clientY - rect.top) / gridSize);
+
+    if(x >= 0 && y >= 0 && x < Math.floor(cadCanvas.width/gridSize) && y < Math.floor(cadCanvas.height/gridSize)){
+      cadModules.push({ type, x, y, id: Date.now() });
+      updateCadStats();
+      renderCad();
+      toast(`Placed ${type.toUpperCase()} module`);
+    }
+  };
+}
+
+document.querySelectorAll('.cadItem').forEach(item => {
+  item.ondragstart = (e) => {
+    e.dataTransfer.setData('type', item.dataset.type);
+  };
+});
+
+function renderCad(){
+  if(!cadCtx) return;
+  const w = cadCanvas.width, h = cadCanvas.height;
+  cadCtx.clearRect(0, 0, w, h);
+
+  // Background Grid
+  cadCtx.strokeStyle = '#141a38';
+  cadCtx.lineWidth = 1;
+  for (let x = 0; x < w; x += gridSize) {
+    cadCtx.beginPath(); cadCtx.moveTo(x, 0); cadCtx.lineTo(x, h); cadCtx.stroke();
+  }
+  for (let y = 0; y < h; y += gridSize) {
+    cadCtx.beginPath(); cadCtx.moveTo(0, y); cadCtx.lineTo(w, y); cadCtx.stroke();
+  }
+
+  // Draw Connections between Modules
+  cadCtx.strokeStyle = '#344580';
+  cadCtx.lineWidth = 3;
+  for(let i=0; i<cadModules.length; i++){
+    for(let j=i+1; j<cadModules.length; j++){
+      const m1 = cadModules[i], m2 = cadModules[j];
+      const dist = Math.hypot(m1.x - m2.x, m1.y - m2.y);
+      if(dist < 3.5){
+        cadCtx.beginPath();
+        cadCtx.moveTo(m1.x * gridSize + gridSize/2, m1.y * gridSize + gridSize/2);
+        cadCtx.lineTo(m2.x * gridSize + gridSize/2, m2.y * gridSize + gridSize/2);
+        cadCtx.stroke();
+      }
+    }
+  }
+
+  // Draw Placed Modules
+  const icons = { hab:'🏠', solar:'☀️', water:'💧', greenhouse:'🌱', comm:'📡', nuclear:'⚛️' };
+  const colors = { hab:'#2a3a7c', solar:'#6e5b1e', water:'#1b567a', greenhouse:'#1e5e3a', comm:'#512d7a', nuclear:'#7a2136' };
+
+  cadModules.forEach(m => {
+    cadCtx.fillStyle = colors[m.type] || '#20264b';
+    cadCtx.strokeStyle = '#4cc9ff';
+    cadCtx.lineWidth = 1.5;
+    cadCtx.fillRect(m.x * gridSize + 2, m.y * gridSize + 2, gridSize - 4, gridSize - 4);
+    cadCtx.strokeRect(m.x * gridSize + 2, m.y * gridSize + 2, gridSize - 4, gridSize - 4);
+
+    cadCtx.font = '16px sans-serif';
+    cadCtx.textAlign = 'center';
+    cadCtx.textBaseline = 'middle';
+    cadCtx.fillText(icons[m.type]||'📦', m.x * gridSize + gridSize/2, m.y * gridSize + gridSize/2);
+  });
+}
+
+function updateCadStats(){
+  $('cadModuleCount').innerHTML = `${cadModules.length} <small>/ 64</small>`;
+  let power = 0, water = 0, crew = 0;
+
+  cadModules.forEach(m => {
+    if(m.type==='solar') power += 120;
+    if(m.type==='nuclear') power += 500;
+    if(m.type==='hab') { power -= 40; crew += 10; }
+    if(m.type==='water') { power -= 60; water += 800; }
+    if(m.type==='greenhouse') { power -= 50; water -= 150; }
+    if(m.type==='comm') { power -= 30; }
+  });
+
+  $('cadPowerBalance').innerHTML = `${power >= 0 ? '+'+power : power} <small>kW</small>`;
+  $('cadWaterOutput').innerHTML = `${water} <small>L/day</small>`;
+  $('cadCrewCap').innerHTML = `${crew} <small>settlers</small>`;
+
+  // Update Roadmap Table
+  const table = $('roadmapTable');
+  table.innerHTML = `<tr><th>Module</th><th>Grid Coordinates</th><th>Power Req / Gen</th><th>Status</th></tr>` +
+    cadModules.map(m => `
+      <tr>
+        <td>${m.type.toUpperCase()}</td>
+        <td>X:${m.x}, Y:${m.y}</td>
+        <td>${['solar','nuclear'].includes(m.type)?'+GEN':'-REQ'}</td>
+        <td><span class="badge">ONLINE</span></td>
+      </tr>
+    `).join('');
+}
+
+$('clearCad').onclick = () => {
+  cadModules.length = 0;
+  updateCadStats();
+  renderCad();
+  toast('CAD grid cleared');
+};
+
+$('exportCad').onclick = () => {
+  toast('CAD Blueprint exported to telemetry logs');
+};
+
+if($('build')){$('build').onclick = () => {
+    if(!cadModules.length){
+      toast('Add modules to CAD grid first');
+      return;
+    }
+    $('roadmapIntro').textContent = `Roadmap generated for ${cadModules.length} deployed modules. Construction sequencing optimized for life-support primacy.`;
+    toast('Deployment roadmap generated');
+  };
+}
+
+/* --------------------------------------------------------
+   LIFE SUPPORT & BUFFER FORECAST LOGIC
+-------------------------------------------------------- */
+function updateLifeSupport(){
+  const crew = Math.max(1, parseInt($('crew').value) || 1);
+  const waterPerCap = 2.7; // L/day/person
+  const oxyPerCap = 0.8;   // kg/day/person
+  const foodPerCap = 0.6;  // kg/day/person
+  const powerPerCap = 9.3; // kWh/day/person
+
+  const dailyWater = (crew * waterPerCap).toFixed(1);
+  const dailyOxy = (crew * oxyPerCap).toFixed(1);
+  const dailyFood = (crew * foodPerCap).toFixed(1);
+  const dailyPower = (crew * powerPerCap).toFixed(1);
+
+  $('useWater').textContent = dailyWater;
+  $('useOxy').textContent = dailyOxy;
+  $('useFood').textContent = dailyFood;
+  $('usePower').textContent = dailyPower;
+
+  // Buffer capacities
+  const totalWaterBufferL = 5000;
+  const totalOxyBufferKg = 1500;
+  const totalFoodBufferKg = 1200;
+
+  const waterDays = Math.floor(totalWaterBufferL / (crew * waterPerCap));
+  const oxyDays = Math.floor(totalOxyBufferKg / (crew * oxyPerCap));
+  const foodDays = Math.floor(totalFoodBufferKg / (crew * foodPerCap));
+
+  const minBuffer = Math.min(waterDays, oxyDays, foodDays);
+
+  $('forecastOut').innerHTML = `
+    <div class="card" style="background:#0b1025;border:1px solid #252b52;padding:14px">
+      <div class="kpi">ESTIMATED SURVIVAL BUFFER</div>
+      <div class="metric" style="color:var(--green)">${minBuffer} <small>days</small></div>
+      <div class="tiny" style="margin-top:8px;line-height:1.6;color:var(--muted)">
+        • Water Buffer: <b>${waterDays} days</b> (${totalWaterBufferL} L reserve)<br>
+        • Oxygen Buffer: <b>${oxyDays} days</b> (${totalOxyBufferKg} kg reserve)<br>
+        • Food Buffer: <b>${foodDays} days</b> (${totalFoodBufferKg} kg reserve)
+      </div>
+    </div>
+  `;
+}
+
+if($('forecast'))$('forecast').onclick = () => {
+  updateLifeSupport();
+  toast('Life support forecast recalculated');
+};
+
+if($('crew'))$('crew').oninput = updateLifeSupport;
+updateLifeSupport();
+
+/* --------------------------------------------------------
+   MARS SURFACE COMMS CHAT INTERFACE
+-------------------------------------------------------- */
+const chatBox = $('chatBox');
+const chatInput = $('chatInput');
+const sendMsgBtn = $('sendMsgBtn');
+
+function sendChatMessage(){
+  const text = chatInput.value.trim();
+  if(!text) return;
+
+  const now = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  
+  // Add Mars Base Alpha Message
+  const marsMsg = document.createElement('div');
+  marsMsg.className = 'msg mars';
+  marsMsg.innerHTML = `<div class="meta"><span>MARS BASE ALPHA</span><span>${now}</span></div>${text}`;
+  chatBox.appendChild(marsMsg);
+  chatInput.value = '';
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+  // Surface Relay Response
+  setTimeout(() => {
+    const remoteMsg = document.createElement('div');
+    remoteMsg.className = 'msg remote';
+    remoteMsg.innerHTML = `<div class="meta"><span>JEZERO OUTPOST COMMAND</span><span>${now}</span></div>Acknowledge transmission: "${text}". Relay node logged request successfully.`;
+    chatBox.appendChild(remoteMsg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    toast('📡 Surface signal acknowledged');
+  }, 1000);
+}
+
+sendMsgBtn.onclick = sendChatMessage;
+chatInput.onkeypress = (e) => { if(e.key === 'Enter') sendChatMessage(); };
+
+/* Emergency Crisis Simulation Handlers */
+const crisisScenarios={dust:['🌪️ Regional dust storm',55,'STORM MODE','ONLINE','Solar falls; batteries engage and non-essential loads are curtailed.'],globalDust:['🟥 Global dust storm',24,'SURVIVAL MODE','DEGRADED','Large-scale dust reduces solar generation; reserve energy is protected.'],power:['⚡ Power failure',12,'BACKUP POWER','ONLINE','Primary generation is offline; backup systems take priority.'],water:['💧 Water contamination',100,'WATER ALERT','ONLINE','Drinking loop is isolated while reserve water and purification are activated.'],comm:['📡 Communication loss',100,'AUTONOMOUS','DEGRADED','Crew switches to local relay and store-and-forward communications.'],pressure:['🫧 Habitat pressure leak',100,'LOCKDOWN','ONLINE','Affected section is isolated and crew movement is restricted.']};
+$('simulateCrisis').onclick=()=>{let d=crisisScenarios[$('crisisType').value],sev=$('crisisSeverity').value,m=sev==='high'?1.15:sev==='low'?.85:1,solar=Math.max(5,Math.round(d[1]/m));$('solar').textContent=solar+'\%';$('hab').textContent=d[2];$('comm').textContent=d[3];$('crisisLog').innerHTML='<b>'+d[0]+' · '+sev.toUpperCase()+'</b><p class="muted">'+d[4]+'</p>';toast(d[0]+' simulated')};
+$('clearCrisis').onclick=()=>{$('solar').textContent='100\%';$('hab').textContent='NOMINAL';$('comm').textContent='ONLINE';$('evacReady').textContent='63%';$('evacPanel').style.display='none';$('crisisLog').innerHTML='<b>System restored</b><p class="muted">All simulated systems returned to nominal state.</p>';toast('Crisis cleared')};
+
+if($('evac')){$('evac').onclick = () => {
+    $('evacPanel').style.display = 'block';$('evacSteps').innerHTML = `
+      <div class="roadmapStep"><b>Step 1:</b> Secure primary pressurized habitats.</div>
+      <div class="roadmapStep"><b>Step 2:</b> Transfer critical life-support reserves to ascent vehicles.</div>
+      <div class="roadmapStep"><b>Step 3:</b> Initiate countdown for orbital transfer standby.</div>
+    `;
+    toast('🚨 Evacuation sequence initiated');
+  };
+}
+
+// Window Load Initialization
+window.onload = () => {
+  init3DMarsAtlas();
+  initCadCanvas();
+};
+</script>
+</body>
+</html>
